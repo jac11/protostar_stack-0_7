@@ -5,6 +5,7 @@ import random
 import argparse
 import sys
 import os 
+import subprocess
 
 class Tools :
    
@@ -57,7 +58,6 @@ class Tools :
             if len_alfa == 1 or len_alfa < 27:                    
                  ALfa = ''.join((string.ascii_uppercase[i:i+1]*4)for i in range(len_alfa)) 
                  print ALfa
-                 exit()
                  with open("./.data",'w')as data:
                     self.dataW =  data.write(ALfa)
                  exit()    
@@ -91,11 +91,12 @@ class Tools :
             if self.args.Hexdecode  :
                  hexdecode = self.args.Hexdecode
                  hexdecode = hexdecode.replace("0x","")
+                 hexdecode ="".join(reversed([hexdecode[i:i+2] for i in range(0,len( hexdecode), 2)]))
                  hexdecode = hexdecode.decode("hex")
-                 print"decode HEX is : ", hexdecode
+                 print"decode HEX is : ", hexdecode                
                  with open("./.data",'r')as data:
                      find = data.read()                    
-                 located = find.find(hexdecode)
+                 located = find.find( hexdecode)
                  if hexdecode in find  :
                     print "Offset Found at  : ",located      
                     if os.path.isfile("./.data"):
@@ -114,11 +115,11 @@ class Tools :
             exit()               
             
     def little_endian1(self):
-        #try: 
+       
             if self.args.L_endian:
                little_endian =  self.args.L_endian
-               little_endian  =   little_endian.replace("0x","")
-               little_endian =   little_endian[::-1]
+               little_endian1  =   little_endian.replace("0x","")
+               little_endian = "".join(reversed([little_endian1  [i:i+2] for i in range(0, len(little_endian1  ), 2)]))
                little_endian = "".join('\\x%s'% little_endian[i:i+2] for i in range(0, len( little_endian), 2))
                little_endian = "".join('"\\x%s"'% little_endian[i:i+32] for i in range(0, len( little_endian), 32))
                little_endian.replace(" ","")
@@ -129,7 +130,7 @@ class Tools :
                print"Usege : [Option] -s [arguments]  Hexaddress "
                print"Exsampel: -s 0x0876bf67 "                
                          
-                       
+   
     def Main(self):
         if self.args.char :       
              self.ALFA__()  
@@ -151,11 +152,3 @@ class Tools :
                                   
 if __name__=="__main__":
     Tools()
-
-
-
-
-
-
-
-
