@@ -5,8 +5,8 @@ import random
 import argparse
 import sys
 import os 
+import re
 import subprocess
-
 class Tools :
    
     def __init__(self):
@@ -18,7 +18,10 @@ class Tools :
 	parser.add_argument( '-A',"--alfa_64"  , metavar='' , action =None,help ="generate AAAAAAAAtoZZZZZZZZ 64bit ""Exsample :-A x64 -l 26")
 	parser.add_argument( '-H',"--Hexdecode", metavar='' , action =None ,help ="to decode hex address ""Exampel: -H 0x00000000", type =str)
 	parser.add_argument( '-l',"--length"   , metavar='' , action =None,help ="to give length of the pattern ", type = int)
-	parser.add_argument( '-s',"--L_endian", metavar='' , action =None ,help ="to little-endian struct " "Exsampel: -s 0x0876bf67") 
+	parser.add_argument( '-s',"--L_endian", metavar='' , action =None ,help ="to little-endian struct " "EExsample: -s 0x0876bf67") 
+        parser.add_argument( '-G',"--libc"    , metavar='' , action =None ,help ="to grep from libc Library " "Exsample -G /bin/sh") 
+        parser.add_argument( '-F',"--object"  , metavar='' , action =None ,help ="Select  program  dump " "Exsample: -F program.o -D ret") 
+        parser.add_argument( '-D',"--dump"  , metavar='' , action =None ,help ="grep program addresses " " Exsample: -F Program -D pop") 
 	self.args = parser.parse_args()
 	self.Main()
 	
@@ -35,7 +38,7 @@ class Tools :
                  print"Usege : [Option] -c [arguments] a [OPtion] -l [arguments] Number of length."        
         except UnboundLocalError:
                  print"Usege : [Option] -c [arguments] a [OPtion] -l [arguments] Number of length."
-                 print"Exsampel: -c a -l 200"  
+                 print"Exsample: -c a -l 200"  
                  exit()
     def ran(self):        
             argv = sys.argv[2]                  
@@ -48,7 +51,7 @@ class Tools :
                  exit()
             else:
                  print"Usege : [Option] -r [arguments] r [OPtion] -l [arguments] Number of length."
-                 print"Exsampel: -r  r -l 100" 
+                 print"Exsample: -r  r -l 100" 
                  exit()
     def AAAA(self): 
         try:    
@@ -63,10 +66,11 @@ class Tools :
                  exit()    
             else:
                  print"Usege : [Option] -a [arguments] x86 [OPtion] -l [arguments] Number of length."
-                 print" exsampel: -a  x86 -l 26"            
+                 print "minimum  '1' maximum '26'"
+                 print"Exsample: -a  x86 -l 26"           
         except UnboundLocalError:
                  print"Usege : [Option] -a[arguments] x86 [OPtion] -l [arguments] Number of length."
-                 print"Exsampel: -a  x86 -l 26"      
+                 print"Exsample: -a  x86 -l 26"      
                             
     def x86_64(self):
         try:    
@@ -81,10 +85,11 @@ class Tools :
                  exit()
             else:
                  print"Usege : [Option] -A [arguments] x64 [OPtion] -l [arguments] Number of length."
-                 print"Exsampel: -A  x64 -l 26"            
+                 print "minimum  '1' maximum '26'"
+                 print"Exsample: -A  x64 -l 26"            
         except UnboundLocalError:
                  print"Usege : [Option] -A [arguments] x64 [OPtion] -l [arguments] Number of length."
-                 print"Exsampel: -A  x64 -l 26"                           
+                 print"Exsample: -A  x64 -l 26"                           
    
     def decode(self):
         try:
@@ -107,7 +112,7 @@ class Tools :
                        print "No Offset Found "
             else:
                  print"Usege : [Option] -H [arguments]  HexNumber "
-                 print"Exsampel: -H 0x00000000 "
+                 print"Exsample: -H 0x00000000 "
         except IOError:
                 pass                                            
         except Exception :
@@ -126,11 +131,43 @@ class Tools :
                little_endian.replace(" ","")
                little_endian= little_endian.replace('"\\x','"')               
                print "little_endian is : ",little_endian
+               print "struck mode :","struct.pack","('I',",'{}'.format(self.args.L_endian),")".strip()
             else:
                print"Usege : [Option] -s [arguments]  Hexaddress "
-               print"Exsampel: -s 0x0876bf67 "                
-                         
-   
+               print"Exsample: -s 0x0876bf67 "                
+    
+    def libc_Library(self):
+            if self.args.libc:  
+               Libc_libc = self.args.libc     
+               process = subprocess.Popen(['strings', '-a', '-t','x','/lib/i386-linux-gnu/libc.so.6'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+               stdout, stderr = process.communicate()
+               stdout_libc =stdout
+               get_gerp= re.findall("......."+'{}'.format(Libc_libc),stdout_libc) 
+               if Libc_libc in stdout_libc:   
+                  print"grep _from _libc: ", '\n'.join(get_gerp)                    
+               else:
+                  print "[Error][NotFound] "
+            else:
+               print "[Error][/lib/i386-linux-gnu/libc.so.6]"   
+                  
+    def objdump_file(self):  
+                 
+            if self.args.object and sys.argv[1] == "-F" and sys.argv[2]=="-D":
+               FileName = self.args.object
+               FileDump = self.args.dump
+               with open('./.file_1','w')as file:                 
+                   stdout = subprocess.call(['objdump','-d','{}'.format(FileName)], stdout=file, stderr=file)                         
+               process = subprocess.Popen(['grep','{}'.format(FileDump), './.file_1'], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+               stdout, stderr = process.communicate()
+               print stdout
+               if os.path.isfile("./.file_1"):
+                     os.remove("./.file_1")
+               else:
+                  pass      
+            else:
+               print"Usege : [Option] -F [arguments] filename [OPtion] -D [arguments] grep txt ."
+               print"Exsample -F  Objectfile -D pop"            
+               
     def Main(self):
         if self.args.char :       
              self.ALFA__()  
@@ -149,6 +186,17 @@ class Tools :
                     
         if self.args.L_endian:
              self.little_endian1()
+        
+        if self.args.libc:
+             self.libc_Library()
+             
+        if self.args.object:
+             self.objdump_file()   
                                   
 if __name__=="__main__":
     Tools()
+    
+    
+    
+    
+
