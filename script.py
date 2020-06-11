@@ -152,7 +152,7 @@ class Tools :
                   
     def objdump_file(self):  
                  
-            if self.args.object and sys.argv[1] == "-F" and sys.argv[2]=="-D":
+            if self.args.object and sys.argv[1] == "-F" and sys.argv[3]=="-D":
                FileName = self.args.object
                FileDump = self.args.dump
                with open('./.file_1','w')as file:                 
